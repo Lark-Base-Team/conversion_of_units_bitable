@@ -45,11 +45,27 @@ export default function App() {
     let transformNum = 0;
     const table = await bitable.base.getActiveTable();
     // const field = await table.getFieldById(fieldId);
-    const recordIds = await table.getRecordIdList();
+    // const recordIds = await table.getRecordIdList();
+
+    // 分页改造
+    let recordIdList:string[] = []
+    let hasMorePage = false
+    let nextPageToken: number | undefined = undefined
+    do {
+      const { hasMore, pageToken, recordIds } = await table.getRecordIdListByPage({
+          pageToken: nextPageToken,
+          pageSize: 200
+      })
+      nextPageToken = pageToken
+      hasMorePage = hasMore
+      recordIdList = recordIdList.concat(recordIds)
+    } while (hasMorePage)
+
+
 
     type allUnit = "mm" | "cm" | "m" | "km" | "in" | "feet" | "inches" | "mi" | "nautical miles" | "ms" | "seconds" | "minutes" | "hours" | "days" | "weeks" | "years" | "mg" | 'g' | 'kg' | 'tonne' | 'pound' | 'ounce' | 'deg' | 'rad' | 'turn' | 'grad' | 'celsius' | 'fahrenheit' | 'kelvin' | "radian" | "radians" | "rad" | "rads" | "r" | "turn" | "turns" | "degree" | "degrees" | "deg" | "degs" | "°" | "gradian" | "gradians" | "gon" | "gons" | "grad" | "grads" | "grade" | "grades";
 
-    for (const recordId of recordIds) {
+    for (const recordId of recordIdList) {
       const currentVal = await table.getCellValue(fieldId, recordId!);
       if (typeof currentVal !== 'number' || !currentVal) continue;
 
