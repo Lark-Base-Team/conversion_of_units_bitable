@@ -1,6 +1,6 @@
 import './App.css';
 import { bitable, FieldType } from "@lark-base-open/js-sdk";
-import { Select, Banner, Button, Toast, Typography } from '@douyinfe/semi-ui';
+import { Select, Banner, Button, Toast, Typography,Spin } from '@douyinfe/semi-ui';
 import { IconBox, IconHome, IconExport, IconHandle, IconSync, IconLink } from '@douyinfe/semi-icons';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,8 @@ import { UNITMATCH, UNIT, TIME_UNIT, MASS_UNIT, LENGTH_UNIT, TEMPERATURE_UNIT, A
 export default function App() {
   const [fieldsInfo, setFieldsInfo] = useState<IFieldType[]>([]);
   const [loading, setLoading] = useState(false);
+  const [batchLoading, setBatchLoading] = useState(false);
+
   const [transformLoading, setTransformLoading] = useState(false);
   const [fieldId, setFieldId] = useState<string | undefined>();
   const [targetFieldId, setTargetFieldId] = useState<string | undefined>();
@@ -19,8 +21,9 @@ export default function App() {
   const [currentUnit, setCurrentUnit] = useState<string | undefined>();
   const [targetUnit, setTargetUnit] = useState<string | undefined>();
   const { t } = useTranslation();
-  const { Text } = Typography;
+  const [loadingContent, setLoadingContent] = useState('')
 
+  const { Text } = Typography;
   const getTableMeta = async () => {
     setLoading(true);
     const selection = await bitable.base.getSelection();
@@ -51,6 +54,8 @@ export default function App() {
     let recordIdList:string[] = []
     let hasMorePage = false
     let nextPageToken: number | undefined = undefined
+    setBatchLoading(true);
+
     do {
       const { hasMore, pageToken, recordIds } = await table.getRecordIdListByPage({
           pageToken: nextPageToken,
@@ -64,7 +69,8 @@ export default function App() {
 
 
     type allUnit = "mm" | "cm" | "m" | "km" | "in" | "feet" | "inches" | "mi" | "nautical miles" | "ms" | "seconds" | "minutes" | "hours" | "days" | "weeks" | "years" | "mg" | 'g' | 'kg' | 'tonne' | 'pound' | 'ounce' | 'deg' | 'rad' | 'turn' | 'grad' | 'celsius' | 'fahrenheit' | 'kelvin' | "radian" | "radians" | "rad" | "rads" | "r" | "turn" | "turns" | "degree" | "degrees" | "deg" | "degs" | "°" | "gradian" | "gradians" | "gon" | "gons" | "grad" | "grads" | "grade" | "grades";
-
+ 
+    let total = recordIdList.length;
     for (const recordId of recordIdList) {
       const currentVal = await table.getCellValue(fieldId, recordId!);
       if (typeof currentVal !== 'number' || !currentVal) continue;
@@ -79,12 +85,15 @@ export default function App() {
         return;
       }
       transformNum++;
+      setLoadingContent(t('success.num', { num: transformNum, total, remain: total - transformNum }));
+
     }
     if (transformNum) {
       Toast.success(t('transform_success', { 'transformNum': transformNum }));
     } else {
       Toast.warning(t('transform_warning', { 'transformNum': transformNum }));
     }
+    setBatchLoading(false);
     setTransformLoading(false);
 
   };
@@ -412,6 +421,7 @@ export default function App() {
 
   return (
     <div className={'container'}>
+        <Spin style={{ height: '100vh' }} tip={loadingContent} size="large" spinning={batchLoading}>
       <div className="title">
         <Banner
           fullMode={false}
@@ -503,6 +513,7 @@ export default function App() {
         >{t('transform')}</Button>
       </div>
 
+    </Spin>
     </div>
   )
 }

@@ -5,6 +5,7 @@
   "select_unit_type": "请选择单位类型（长度、时间等）",
   "select_current_unit": "请选择当前是什么单位",
   "select_target_unit": "请选择需要转换为什么单位",
+  "success.num":"成功修改{{num}} / {{total}}个单元格。剩余{{remain}}",
   "help_doc": "帮助文档",
   "transform": "转换",
   "transform_fail": "转换失败，已转换 {{transformNum}} 条数据",

@@ -6,6 +6,7 @@
   "select_current_unit": "Please select current unit",
   "select_target_unit": "Please select target unit",
   "help_doc": "help document",
+  "success.num":"Successfully modified {{num}} out of {{total}} cells. Remaining {{remain}}",
   "transform": "convert",
   "transform_fail": "Transformation failed, transformed {{transformNum}} pieces of data",
   "transform_success": "Transformation succeeded, {{transformNum}} pieces of data have been transformed",
